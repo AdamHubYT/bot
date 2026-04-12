@@ -121,6 +121,10 @@ const API = "https://tg-tycoon-server.onrender.com"; // 🔥 ВСТАВЬ СЮД
 
 let tg = window.Telegram.WebApp;
 tg.expand();
+    let tg = window.Telegram.WebApp;
+tg.expand();
+
+console.log("TG DATA:", tg.initDataUnsafe);
 
 let user = tg.initDataUnsafe?.user;
 let user_id = tg.initDataUnsafe?.user?.id;
