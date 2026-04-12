@@ -76,6 +76,12 @@ width:40%;
 background:#00ff88;
 }
 
+.lb-title {
+margin-top:15px;
+font-weight:800;
+opacity:0.8;
+}
+
 </style>
 </head>
 
@@ -89,9 +95,9 @@ background:#00ff88;
 </div>
 
 <div class="card">
-<div class="stat">⛽ Fuel: <span id="fuel"></span></div>
-<div class="stat">🛢 Oil: <span id="oil"></span></div>
-<div class="stat">⬆ Level: <span id="level"></span></div>
+<div class="stat">⛽ Fuel: <span id="fuel">0</span></div>
+<div class="stat">🛢 Oil: <span id="oil">0</span></div>
+<div class="stat">⬆ Level: <span id="level">1</span></div>
 
 <div class="progress"><div class="bar"></div></div>
 </div>
@@ -99,6 +105,9 @@ background:#00ff88;
 <button class="sell" onclick="sell()">SELL FUEL</button>
 <button class="up" onclick="upgrade()">UPGRADE</button>
 <button class="ref" onclick="copyRef()">REF LINK</button>
+<button class="up" onclick="loadLB()">LEADERBOARD</button>
+
+<div id="lb"></div>
 
 </div>
 
@@ -138,6 +147,23 @@ function copyRef(){
 const link = `https://t.me/YOUR_BOT?start=${user_id}`;
 navigator.clipboard.writeText(link);
 tg.showAlert("Copied!");
+}
+
+async function loadLB(){
+let r = await fetch(API+"/leaderboard");
+let data = await r.json();
+
+let html = "<div class='card'><b>TOP PLAYERS</b></div>";
+
+data.forEach((u, i) => {
+html += `
+<div class='card'>
+#${i+1} User ${u.user_id}<br>
+💰 $${Number(u.money).toFixed(2)}
+</div>`;
+});
+
+document.getElementById("lb").innerHTML = html;
 }
 
 setInterval(sync, 4000);
