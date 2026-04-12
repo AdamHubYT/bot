@@ -1,4 +1,5 @@
 import time
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from supabase import create_client
@@ -12,17 +13,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 🔐 SUPABASE CONFIG
-SUPABASE_URL = "https://dcrutnuamskjbdkutqfr.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjcnV0bnVhbXNramJka3V0cWZyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjAwNjM0MywiZXhwIjoyMDkxNTgyMzQzfQ.ZmL58xaRyuUG2JzxUUzT_bKSRGFfElJTXoWcXPs6Ybk"
+# 🔐 ENV (Render Variables!)
+SUPABASE_URL = os.getenv("https://dcrutnuamskjbdkutqfr.supabase.co")
+SUPABASE_KEY = os.getenv("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjcnV0bnVhbXNramJka3V0cWZyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjAwNjM0MywiZXhwIjoyMDkxNTgyMzQzfQ.ZmL58xaRyuUG2JzxUUzT_bKSRGFfElJTXoWcXPs6Ybk")
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# 🧠 CREATE USER IF NOT EXISTS
+# -------------------------
+# CREATE USER IF NOT EXISTS
+# -------------------------
 def get_user(user_id: int):
     res = supabase.table("users").select("*").eq("user_id", user_id).execute()
 
-    if len(res.data) == 0:
+    if not res.data:
         user = {
             "user_id": user_id,
             "money": 0,
@@ -35,7 +38,9 @@ def get_user(user_id: int):
 
     return res.data[0]
 
-# 🔄 OFFLINE PROGRESS
+# -------------------------
+# OFFLINE PROGRESS
+# -------------------------
 def update_user(user):
     now = int(time.time())
     last = user["last_update"]
@@ -48,7 +53,16 @@ def update_user(user):
         "last_update": now
     }).eq("user_id", user["user_id"]).execute()
 
-# 📊 SYNC
+# -------------------------
+# HEALTH CHECK (ВАЖНО!)
+# -------------------------
+@app.get("/")
+def root():
+    return {"status": "ok"}
+
+# -------------------------
+# SYNC
+# -------------------------
 @app.get("/sync")
 def sync(user_id: int):
     user = get_user(user_id)
@@ -56,7 +70,9 @@ def sync(user_id: int):
     user = get_user(user_id)
     return user
 
-# 💰 SELL
+# -------------------------
+# SELL
+# -------------------------
 @app.post("/sell")
 def sell(user_id: int):
     user = get_user(user_id)
@@ -70,9 +86,11 @@ def sell(user_id: int):
         "fuel": 0
     }).eq("user_id", user_id).execute()
 
-    return {"ok": True}
+    return {"ok": True, "money": money}
 
-# ⬆️ UPGRADE
+# -------------------------
+# UPGRADE
+# -------------------------
 @app.post("/upgrade")
 def upgrade(user_id: int):
     user = get_user(user_id)
