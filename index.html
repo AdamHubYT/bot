@@ -6,57 +6,81 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
+
 body {
 margin:0;
 font-family:system-ui;
-background: radial-gradient(circle at top, #1a1a1a, #000);
+background: radial-gradient(circle at top, #0f0f0f, #000);
 color:white;
 overflow:hidden;
 }
 
 .container {
 padding:20px;
+animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+from {opacity:0; transform:translateY(10px);}
+to {opacity:1; transform:translateY(0);}
 }
 
 .card {
 background: rgba(255,255,255,0.05);
-backdrop-filter: blur(10px);
-padding:15px;
-border-radius:16px;
-margin-bottom:10px;
-border:1px solid rgba(255,255,255,0.1);
+backdrop-filter: blur(12px);
+padding:16px;
+border-radius:18px;
+margin-bottom:12px;
+border:1px solid rgba(255,255,255,0.08);
+transition:0.3s;
+}
+
+.card:active {
+transform: scale(0.98);
 }
 
 .title {
 font-size:22px;
-font-weight:800;
-}
-
-.stat {
-font-size:18px;
-margin:5px 0;
+font-weight:900;
 }
 
 .money {
-font-size:42px;
+font-size:44px;
 color:#00ff88;
 font-weight:900;
+animation: glow 2s infinite;
+}
+
+@keyframes glow {
+0% {text-shadow:0 0 5px #00ff88;}
+50% {text-shadow:0 0 20px #00ff88;}
+100% {text-shadow:0 0 5px #00ff88;}
+}
+
+.stat {
+font-size:16px;
+margin:6px 0;
+opacity:0.9;
 }
 
 button {
 width:100%;
 padding:14px;
 margin-top:10px;
-border-radius:12px;
+border-radius:14px;
 border:none;
 font-size:16px;
-cursor:pointer;
+font-weight:700;
+transition:0.2s;
+}
+
+button:active {
+transform: scale(0.96);
 }
 
 .sell {
 background:#00ff88;
 color:black;
-font-weight:700;
 }
 
 .up {
@@ -64,6 +88,13 @@ background:#111;
 color:#fff;
 border:1px solid #00ff88;
 }
+
+.ref {
+background:#1a1a1a;
+border:1px solid #444;
+color:white;
+}
+
 </style>
 </head>
 
@@ -83,12 +114,14 @@ border:1px solid #00ff88;
 <div class="stat">⬆ Level: <span id="level">1</span></div>
 </div>
 
-<button class="sell" onclick="sell()">SELL FUEL</button>
+<button class="sell" onclick="sell()">SELL</button>
 <button class="up" onclick="upgrade()">UPGRADE</button>
+<button class="ref" onclick="copyRef()">COPY REF LINK</button>
 
 </div>
 
 <script>
+
 const tg = window.Telegram.WebApp;
 tg.expand();
 
@@ -119,8 +152,15 @@ await fetch(API+"/upgrade?user_id="+user_id,{method:"POST"});
 sync();
 }
 
+function copyRef(){
+const link = `https://t.me/YOUR_BOT?start=${user_id}`;
+navigator.clipboard.writeText(link);
+tg.showAlert("Referral copied!");
+}
+
 setInterval(sync, 3000);
 sync();
+
 </script>
 
 </body>
