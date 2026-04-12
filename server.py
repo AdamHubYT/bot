@@ -23,6 +23,7 @@ FUEL_PER_OIL = 8
 FUEL_PRICE = 2.2
 MAX_LEVEL = 10
 
+
 # ---------------- USER ----------------
 def get_user(user_id: int):
     res = supabase.table("users").select("*").eq("user_id", user_id).execute()
@@ -43,32 +44,23 @@ def get_user(user_id: int):
     return res.data[0]
 
 
-# ---------------- OFFLINE ENGINE (FIXED) ----------------
+# ---------------- OFFLINE ENGINE ----------------
 def apply_offline(user):
     now = int(time.time())
     last = user.get("last_update", now)
 
-    delta = max(0, now - last)
-
-    # anti exploit (max 24h offline calc)
-    delta = min(delta, 86400)
+    delta = min(max(0, now - last), 86400)
 
     hours = delta / 3600
 
-    level = user["level"]
-
-    oil_gain = hours * BASE_OIL_PER_HOUR * level
+    oil_gain = hours * BASE_OIL_PER_HOUR * user["level"]
     fuel_gain = oil_gain * FUEL_PER_OIL
 
-    # referral boost
     fuel_gain *= (1 + user.get("ref_bonus", 0))
 
-    new_oil = user["oil"] + oil_gain
-    new_fuel = user["fuel"] + fuel_gain
-
     supabase.table("users").update({
-        "oil": new_oil,
-        "fuel": new_fuel,
+        "oil": user["oil"] + oil_gain,
+        "fuel": user["fuel"] + fuel_gain,
         "last_update": now
     }).eq("user_id", user["user_id"]).execute()
 
@@ -94,7 +86,7 @@ def sell(user_id: int):
         "fuel": 0
     }).eq("user_id", user_id).execute()
 
-    return {"ok": True, "money": money_gain}
+    return {"ok": True}
 
 
 # ---------------- UPGRADE ----------------
@@ -103,22 +95,34 @@ def upgrade(user_id: int):
     user = get_user(user_id)
 
     if user["level"] >= MAX_LEVEL:
-        return {"ok": False, "error": "max level"}
+        return {"ok": False}
 
     cost = user["level"] * 250
 
     if user["money"] < cost:
-        return {"ok": False, "error": "not enough money"}
+        return {"ok": False}
 
     supabase.table("users").update({
         "money": user["money"] - cost,
         "level": user["level"] + 1
     }).eq("user_id", user_id).execute()
 
-    return {"ok": True, "new_level": user["level"] + 1}
+    return {"ok": True}
 
 
-# ---------------- REF SYSTEM FIXED ----------------
+# ---------------- LEADERBOARD ----------------
+@app.get("/leaderboard")
+def leaderboard():
+    res = supabase.table("users") \
+        .select("user_id, money") \
+        .order("money", desc=True) \
+        .limit(10) \
+        .execute()
+
+    return res.data
+
+
+# ---------------- REF ----------------
 @app.get("/ref")
 def ref(user_id: int, ref_id: int):
     if user_id == ref_id:
