@@ -8,7 +8,7 @@ dp = Dispatcher()
 kb = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="🚀 Играть", web_app=WebAppInfo(
-            url="https://adamhubyt.github.io/bot/?v=1"
+            url="https://adamhubyt.github.io/bot/?v=3"
         ))]
     ],
     resize_keyboard=True
