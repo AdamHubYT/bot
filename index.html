@@ -123,7 +123,11 @@ let tg = window.Telegram.WebApp;
 tg.expand();
 
 let user = tg.initDataUnsafe?.user;
-let user_id = user?.id || 1;
+let user_id = tg.initDataUnsafe?.user?.id;
+
+if (!user_id) {
+    user_id = 123; // fallback только для браузера
+}
 
 document.getElementById("name").innerText =
     user ? user.first_name : "Player";
