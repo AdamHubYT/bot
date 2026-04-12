@@ -9,42 +9,67 @@
 body{
 margin:0;
 font-family:system-ui;
-background:#0f0f0f;
+background:linear-gradient(180deg,#0f0f0f,#1a1a1a);
 color:white;
 overflow:hidden;
 }
 
 .container{padding:20px}
 
-.card{
-background:#1c1c1c;
-padding:15px;
-border-radius:16px;
+.title{
+font-size:20px;
+opacity:0.7;
+}
+
+.name{
+font-size:26px;
+font-weight:700;
 margin-bottom:10px;
 }
 
-.title{
-font-size:22px;
-font-weight:700;
+.money{
+font-size:42px;
+color:#ffd54f;
+font-weight:800;
+margin-bottom:20px;
 }
 
-.money{
-font-size:40px;
-color:#ffca28;
-font-weight:800;
+.card{
+background:#1e1e1e;
+padding:15px;
+border-radius:16px;
+margin-bottom:10px;
+display:flex;
+justify-content:space-between;
 }
 
 button{
 width:100%;
 padding:14px;
 margin-top:10px;
-border-radius:12px;
+border-radius:14px;
 border:none;
 font-size:16px;
+font-weight:600;
 }
 
-.sell{background:#ffca28;color:black}
-.up{background:#222;color:#66bb6a;border:2px solid #66bb6a}
+.sell{
+background:#ffd54f;
+color:black;
+}
+
+.up{
+background:#2a2a2a;
+color:#66bb6a;
+border:2px solid #66bb6a;
+}
+
+.anim{
+transition:0.2s;
+}
+.anim:active{
+transform:scale(0.95);
+}
 </style>
 </head>
 
@@ -52,15 +77,16 @@ font-size:16px;
 
 <div class="container">
 
-<div class="title" id="name">Player</div>
+<div class="title">Tycoon</div>
+<div class="name" id="name">Loading...</div>
 
 <div class="money">$<span id="money">0</span></div>
 
-<div class="card">Fuel: <span id="fuel">0</span></div>
-<div class="card">Level: <span id="level">1</span></div>
+<div class="card">Fuel <span id="fuel">0</span></div>
+<div class="card">Level <span id="level">1</span></div>
 
-<button class="sell" onclick="sell()">Sell</button>
-<button class="up" onclick="upgrade()">Upgrade</button>
+<button class="sell anim" onclick="sell()">SELL</button>
+<button class="up anim" onclick="upgrade()">UPGRADE</button>
 
 </div>
 
@@ -68,33 +94,43 @@ font-size:16px;
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-const user = tg.initDataUnsafe?.user;
-const user_id = user?.id;
+// FIX USER
+let user = tg.initDataUnsafe?.user;
 
-document.getElementById("name").innerText = user?.first_name || "Player";
+if (!user) {
+    user = {
+        id: 1,
+        first_name: "Test Player"
+    };
+}
 
+const user_id = user.id;
+document.getElementById("name").innerText = user.first_name;
+
+// ⚠️ ВСТАВЬ СВОЙ RENDER URL
 const API = "https://tg-tycoon-server.onrender.com";
 
 async function sync(){
-let r = await fetch(API+"/sync?user_id="+user_id);
-let d = await r.json();
+    let r = await fetch(API+"/sync?user_id="+user_id);
+    let d = await r.json();
 
-document.getElementById("money").innerText = d.money.toFixed(2);
-document.getElementById("fuel").innerText = d.fuel.toFixed(2);
-document.getElementById("level").innerText = d.level;
+    document.getElementById("money").innerText = d.money.toFixed(2);
+    document.getElementById("fuel").innerText = d.fuel.toFixed(2);
+    document.getElementById("level").innerText = d.level;
 }
 
 async function sell(){
-await fetch(API+"/sell?user_id="+user_id,{method:"POST"});
-sync();
+    await fetch(API+"/sell?user_id="+user_id,{method:"POST"});
+    sync();
 }
 
 async function upgrade(){
-await fetch(API+"/upgrade?user_id="+user_id,{method:"POST"});
-sync();
+    await fetch(API+"/upgrade?user_id="+user_id,{method:"POST"});
+    sync();
 }
 
-setInterval(sync,2000);
+// LIVE UPDATE
+setInterval(sync, 2000);
 sync();
 </script>
 
