@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+body{
+margin:0;
+font-family:system-ui;
+background:#0f0f0f;
+color:white;
+overflow:hidden;
+}
+
+.container{padding:20px}
+
+.card{
+background:#1c1c1c;
+padding:15px;
+border-radius:16px;
+margin-bottom:10px;
+}
+
+.title{
+font-size:22px;
+font-weight:700;
+}
+
+.money{
+font-size:40px;
+color:#ffca28;
+font-weight:800;
+}
+
+button{
+width:100%;
+padding:14px;
+margin-top:10px;
+border-radius:12px;
+border:none;
+font-size:16px;
+}
+
+.sell{background:#ffca28;color:black}
+.up{background:#222;color:#66bb6a;border:2px solid #66bb6a}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="title" id="name">Player</div>
+
+<div class="money">$<span id="money">0</span></div>
+
+<div class="card">Fuel: <span id="fuel">0</span></div>
+<div class="card">Level: <span id="level">1</span></div>
+
+<button class="sell" onclick="sell()">Sell</button>
+<button class="up" onclick="upgrade()">Upgrade</button>
+
+</div>
+
+<script>
+const tg = window.Telegram.WebApp;
+tg.expand();
+
+const user = tg.initDataUnsafe?.user;
+const user_id = user?.id;
+
+document.getElementById("name").innerText = user?.first_name || "Player";
+
+const API = "https://tg-tycoon-server.onrender.com";
+
+async function sync(){
+let r = await fetch(API+"/sync?user_id="+user_id);
+let d = await r.json();
+
+document.getElementById("money").innerText = d.money.toFixed(2);
+document.getElementById("fuel").innerText = d.fuel.toFixed(2);
+document.getElementById("level").innerText = d.level;
+}
+
+async function sell(){
+await fetch(API+"/sell?user_id="+user_id,{method:"POST"});
+sync();
+}
+
+async function upgrade(){
+await fetch(API+"/upgrade?user_id="+user_id,{method:"POST"});
+sync();
+}
+
+setInterval(sync,2000);
+sync();
+</script>
+
+</body>
+</html>
