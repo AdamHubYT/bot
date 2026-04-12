@@ -2,73 +2,67 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
-body{
+body {
 margin:0;
 font-family:system-ui;
-background:linear-gradient(180deg,#0f0f0f,#1a1a1a);
+background: radial-gradient(circle at top, #1a1a1a, #000);
 color:white;
 overflow:hidden;
 }
 
-.container{padding:20px}
-
-.title{
-font-size:20px;
-opacity:0.7;
+.container {
+padding:20px;
 }
 
-.name{
-font-size:26px;
-font-weight:700;
-margin-bottom:10px;
-}
-
-.money{
-font-size:42px;
-color:#ffd54f;
-font-weight:800;
-margin-bottom:20px;
-}
-
-.card{
-background:#1e1e1e;
+.card {
+background: rgba(255,255,255,0.05);
+backdrop-filter: blur(10px);
 padding:15px;
 border-radius:16px;
 margin-bottom:10px;
-display:flex;
-justify-content:space-between;
+border:1px solid rgba(255,255,255,0.1);
 }
 
-button{
+.title {
+font-size:22px;
+font-weight:800;
+}
+
+.stat {
+font-size:18px;
+margin:5px 0;
+}
+
+.money {
+font-size:42px;
+color:#00ff88;
+font-weight:900;
+}
+
+button {
 width:100%;
 padding:14px;
 margin-top:10px;
-border-radius:14px;
+border-radius:12px;
 border:none;
 font-size:16px;
-font-weight:600;
+cursor:pointer;
 }
 
-.sell{
-background:#ffd54f;
+.sell {
+background:#00ff88;
 color:black;
+font-weight:700;
 }
 
-.up{
-background:#2a2a2a;
-color:#66bb6a;
-border:2px solid #66bb6a;
-}
-
-.anim{
-transition:0.2s;
-}
-.anim:active{
-transform:scale(0.95);
+.up {
+background:#111;
+color:#fff;
+border:1px solid #00ff88;
 }
 </style>
 </head>
@@ -77,16 +71,20 @@ transform:scale(0.95);
 
 <div class="container">
 
-<div class="title">Tycoon</div>
-<div class="name" id="name">Loading...</div>
+<div class="title" id="name">Player</div>
 
+<div class="card">
 <div class="money">$<span id="money">0</span></div>
+</div>
 
-<div class="card">Fuel <span id="fuel">0</span></div>
-<div class="card">Level <span id="level">1</span></div>
+<div class="card">
+<div class="stat">⛽ Fuel: <span id="fuel">0</span></div>
+<div class="stat">🛢 Oil: <span id="oil">0</span></div>
+<div class="stat">⬆ Level: <span id="level">1</span></div>
+</div>
 
-<button class="sell anim" onclick="sell()">SELL</button>
-<button class="up anim" onclick="upgrade()">UPGRADE</button>
+<button class="sell" onclick="sell()">SELL FUEL</button>
+<button class="up" onclick="upgrade()">UPGRADE</button>
 
 </div>
 
@@ -94,43 +92,34 @@ transform:scale(0.95);
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-// FIX USER
-let user = tg.initDataUnsafe?.user;
+const user = tg.initDataUnsafe?.user;
+const user_id = user?.id;
 
-if (!user) {
-    user = {
-        id: 1,
-        first_name: "Test Player"
-    };
-}
+document.getElementById("name").innerText = user?.first_name || "Player";
 
-const user_id = user.id;
-document.getElementById("name").innerText = user.first_name;
-
-// ⚠️ ВСТАВЬ СВОЙ RENDER URL
 const API = "https://bot-kxfw.onrender.com";
 
 async function sync(){
-    let r = await fetch(API+"/sync?user_id="+user_id);
-    let d = await r.json();
+let r = await fetch(API+"/sync?user_id="+user_id);
+let d = await r.json();
 
-    document.getElementById("money").innerText = d.money.toFixed(2);
-    document.getElementById("fuel").innerText = d.fuel.toFixed(2);
-    document.getElementById("level").innerText = d.level;
+document.getElementById("money").innerText = d.money.toFixed(2);
+document.getElementById("fuel").innerText = d.fuel.toFixed(2);
+document.getElementById("oil").innerText = d.oil.toFixed(2);
+document.getElementById("level").innerText = d.level;
 }
 
 async function sell(){
-    await fetch(API+"/sell?user_id="+user_id,{method:"POST"});
-    sync();
+await fetch(API+"/sell?user_id="+user_id,{method:"POST"});
+sync();
 }
 
 async function upgrade(){
-    await fetch(API+"/upgrade?user_id="+user_id,{method:"POST"});
-    sync();
+await fetch(API+"/upgrade?user_id="+user_id,{method:"POST"});
+sync();
 }
 
-// LIVE UPDATE
-setInterval(sync, 2000);
+setInterval(sync, 3000);
 sync();
 </script>
 
