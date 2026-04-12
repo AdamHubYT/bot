@@ -3,188 +3,98 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<title>Tycoon Game</title>
-
 <style>
-body {
-    margin:0;
-    font-family: system-ui;
-    color:white;
-    background:#111;
+body{
+margin:0;
+font-family:system-ui;
+background:#0f0f0f;
+color:white;
+overflow:hidden;
 }
 
-.overlay {
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.65);
+.container{padding:20px}
+
+.card{
+background:#1c1c1c;
+padding:15px;
+border-radius:16px;
+margin-bottom:10px;
 }
 
-.container {
-    position:relative;
-    padding:20px;
+.title{
+font-size:22px;
+font-weight:700;
 }
 
-.header {
-    margin-bottom:20px;
+.money{
+font-size:40px;
+color:#ffca28;
+font-weight:800;
 }
 
-#name {
-    font-size:22px;
-    font-weight:700;
+button{
+width:100%;
+padding:14px;
+margin-top:10px;
+border-radius:12px;
+border:none;
+font-size:16px;
 }
 
-#username {
-    font-size:14px;
-    opacity:0.6;
-}
-
-.balance {
-    font-size:44px;
-    font-weight:800;
-    color:#ffca28;
-    margin:15px 0;
-}
-
-.card {
-    background:rgba(255,255,255,0.08);
-    padding:15px;
-    border-radius:16px;
-    margin-bottom:10px;
-    animation:fadeIn 0.3s ease;
-}
-
-.btn {
-    width:100%;
-    padding:15px;
-    border-radius:14px;
-    border:none;
-    font-size:16px;
-    margin-top:10px;
-}
-
-.primary {
-    background:#ffca28;
-    color:black;
-}
-
-.secondary {
-    background:none;
-    border:2px solid #66bb6a;
-    color:#66bb6a;
-}
-
-@keyframes fadeIn {
-    from {opacity:0; transform:translateY(10px);}
-    to {opacity:1; transform:translateY(0);}
-}
-
-.btn:active {
-    transform:scale(0.97);
-}
+.sell{background:#ffca28;color:black}
+.up{background:#222;color:#66bb6a;border:2px solid #66bb6a}
 </style>
 </head>
 
 <body>
-<div class="overlay"></div>
 
 <div class="container">
 
-<div class="header">
-    <div id="name">Player</div>
-    <div id="username"></div>
-</div>
+<div class="title" id="name">Player</div>
 
-<div class="balance">$<span id="money">0</span></div>
+<div class="money">$<span id="money">0</span></div>
 
-<div class="card">
-    ⛽ Fuel: <span id="fuel">0</span>
-</div>
+<div class="card">Fuel: <span id="fuel">0</span></div>
+<div class="card">Level: <span id="level">1</span></div>
 
-<div class="card">
-    🏭 Level: <span id="level">1</span>
-</div>
-
-<div class="card" id="offlineCard" style="display:none;">
-    💤 Offline earned: $<span id="offline">0</span>
-</div>
-
-<button class="btn primary" onclick="sell()">Sell Fuel</button>
-<button class="btn secondary" onclick="upgrade()">Upgrade</button>
+<button class="sell" onclick="sell()">Sell</button>
+<button class="up" onclick="upgrade()">Upgrade</button>
 
 </div>
 
 <script>
-const API = "https://tg-tycoon-server.onrender.com"; // 🔥 ВСТАВЬ СЮДА
-
-let tg = window.Telegram.WebApp;
-tg.expand();
-    let tg = window.Telegram.WebApp;
+const tg = window.Telegram.WebApp;
 tg.expand();
 
-console.log("TG DATA:", tg.initDataUnsafe);
+const user = tg.initDataUnsafe?.user;
+const user_id = user?.id;
 
-let user = tg.initDataUnsafe?.user;
-let user_id = tg.initDataUnsafe?.user?.id;
+document.getElementById("name").innerText = user?.first_name || "Player";
 
-if (!user_id) {
-    user_id = 123; // fallback только для браузера
+const API = "https://tg-tycoon-server.onrender.com";
+
+async function sync(){
+let r = await fetch(API+"/sync?user_id="+user_id);
+let d = await r.json();
+
+document.getElementById("money").innerText = d.money.toFixed(2);
+document.getElementById("fuel").innerText = d.fuel.toFixed(2);
+document.getElementById("level").innerText = d.level;
 }
 
-document.getElementById("name").innerText =
-    user ? user.first_name : "Player";
-
-document.getElementById("username").innerText =
-    user?.username ? "@" + user.username : "";
-
-function animate(id, value) {
-    let el = document.getElementById(id);
-    let start = parseFloat(el.innerText) || 0;
-    let end = value;
-    let startTime = Date.now();
-
-    function step() {
-        let p = Math.min((Date.now() - startTime) / 300, 1);
-        el.innerText = (start + (end - start) * p).toFixed(2);
-        if (p < 1) requestAnimationFrame(step);
-    }
-
-    step();
+async function sell(){
+await fetch(API+"/sell?user_id="+user_id,{method:"POST"});
+sync();
 }
 
-// 🔁 SYNC
-async function sync() {
-    let res = await fetch(API + "/sync?user_id=" + user_id);
-    let data = await res.json();
-
-    animate("money", data.money);
-    document.getElementById("fuel").innerText = data.fuel.toFixed(2);
-    document.getElementById("level").innerText = data.level;
-
-    if (data.offline > 0) {
-        document.getElementById("offlineCard").style.display = "block";
-        document.getElementById("offline").innerText = data.offline.toFixed(2);
-    }
+async function upgrade(){
+await fetch(API+"/upgrade?user_id="+user_id,{method:"POST"});
+sync();
 }
 
-// 💰 SELL
-async function sell() {
-    await fetch(API + "/sell?user_id=" + user_id, {method:"POST"});
-    sync();
-}
-
-// ⬆️ UPGRADE
-async function upgrade() {
-    await fetch(API + "/upgrade?user_id=" + user_id, {method:"POST"});
-    sync();
-}
-
-// ❌ disable zoom
-document.addEventListener('gesturestart', e => e.preventDefault());
-
-setInterval(sync, 2000);
+setInterval(sync,2000);
 sync();
 </script>
 
