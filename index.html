@@ -1,158 +1,104 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Fuel Mining Tycoon</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <style>
-        :root {
-            --bg-color: #1a1a1a;
-            --text-color: #ffffff;
-            --hint-color: #aaaaaa;
-            --accent-main: #ffca28;
-            --accent-fuel: #ef5350;
-            --accent-green: #66bb6a;
-        }
+<style>
+body {
+    margin:0;
+    font-family: system-ui;
+    color:white;
+    background:url('assets/bg.jpg') center/cover no-repeat;
+}
 
-        body {
-            margin: 0;
-            font-family: Arial;
-            color: white;
+.overlay {
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+}
 
-            background: url('assets/bg.jpg') no-repeat center center fixed;
-            background-size: cover;
-        }
+.container {
+    position:relative;
+    padding:20px;
+}
 
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.65);
-            z-index: -1;
-        }
+.balance {
+    font-size:42px;
+    font-weight:800;
+    color:#ffca28;
+}
 
-        header {
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-        }
+.card {
+    background:rgba(255,255,255,0.08);
+    padding:15px;
+    border-radius:16px;
+    margin-top:10px;
+}
 
-        .balance {
-            text-align: center;
-            margin: 20px;
-        }
+.btn {
+    margin-top:10px;
+    padding:15px;
+    border-radius:14px;
+    border:none;
+    font-size:16px;
+}
 
-        .balance h1 {
-            font-size: 40px;
-            color: var(--accent-main);
-        }
-
-        .card {
-            background: rgba(255,255,255,0.05);
-            margin: 10px;
-            padding: 15px;
-            border-radius: 12px;
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            border-radius: 12px;
-            border: none;
-            font-size: 16px;
-            margin-top: 10px;
-            cursor: pointer;
-        }
-
-        .sell {
-            background: var(--accent-main);
-            color: black;
-        }
-
-        .upgrade {
-            background: none;
-            border: 2px solid var(--accent-green);
-            color: var(--accent-green);
-        }
-
-        #settings {
-            display:none;
-            position:fixed;
-            bottom:0;
-            width:100%;
-            background:#222;
-            padding:20px;
-        }
-    </style>
+.primary {background:#ffca28;color:black;}
+.secondary {border:2px solid #66bb6a;color:#66bb6a;background:none;}
+</style>
 </head>
 
 <body>
+<div class="overlay"></div>
 
-<header>
-    <div id="userName">User</div>
-    <button onclick="openSettings()">⚙️</button>
-</header>
+<div class="container">
+    <h2 id="name">Player</h2>
 
-<div class="balance">
-    <div>Balance</div>
-    <h1>$<span id="balance">0</span></h1>
-</div>
+    <div class="balance">$<span id="money">0</span></div>
 
-<div class="card">
-    Fuel: <span id="fuel">0</span>
-</div>
+    <div class="card">
+        Fuel: <span id="fuel">0</span><br>
+        Level: <span id="level">1</span>
+    </div>
 
-<button class="sell" onclick="sellFuel()" id="sellBtn">Sell</button>
-<button class="upgrade" onclick="upgrade()" id="upgradeBtn">Upgrade</button>
-
-<div id="settings">
-    <h3>Settings</h3>
-    <button onclick="setLang('en')">English</button>
-    <button onclick="setLang('ru')">Русский</button>
+    <button class="btn primary" onclick="sell()">Sell</button>
+    <button class="btn secondary" onclick="upgrade()">Upgrade</button>
 </div>
 
 <script>
+const API = "https://ТВОЙ-СЕРВЕР"; // <-- ВСТАВЬ СЮДА
+
 let tg = window.Telegram.WebApp;
 tg.expand();
 
-if (tg.initDataUnsafe.user) {
-    document.getElementById("userName").innerText =
-        tg.initDataUnsafe.user.first_name;
+let user_id = tg.initDataUnsafe.user?.id || 1;
+
+document.getElementById("name").innerText =
+    tg.initDataUnsafe.user?.first_name || "Player";
+
+async function sync() {
+    let res = await fetch(API + "/sync?user_id=" + user_id);
+    let data = await res.json();
+
+    document.getElementById("money").innerText = data.money.toFixed(2);
+    document.getElementById("fuel").innerText = data.fuel.toFixed(2);
+    document.getElementById("level").innerText = data.level;
 }
 
-// --- ЯЗЫК ---
-const t = {
-    en: { sell: "Sell Fuel", upgrade: "Upgrade" },
-    ru: { sell: "Продать", upgrade: "Улучшить" }
-};
-
-function applyLang() {
-    let lang = localStorage.getItem("lang") || "en";
-    document.getElementById("sellBtn").innerText = t[lang].sell;
-    document.getElementById("upgradeBtn").innerText = t[lang].upgrade;
+async function sell() {
+    await fetch(API + "/sell?user_id=" + user_id, {method:"POST"});
+    sync();
 }
 
-function setLang(lang) {
-    localStorage.setItem("lang", lang);
-    applyLang();
+async function upgrade() {
+    await fetch(API + "/upgrade?user_id=" + user_id, {method:"POST"});
+    sync();
 }
 
-applyLang();
-
-// --- КНОПКИ ---
-function sellFuel() {
-    tg.sendData("sell");
-}
-
-function upgrade() {
-    tg.sendData("upgrade");
-}
-
-function openSettings() {
-    document.getElementById("settings").style.display = "block";
-}
+setInterval(sync, 2000);
+sync();
 </script>
 
 </body>
