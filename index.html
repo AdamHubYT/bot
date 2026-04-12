@@ -2,84 +2,150 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
+/* Залипательный анимированный фон */
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
 
 body {
-margin:0;
-font-family:system-ui;
-background: radial-gradient(circle at top, #111, #000);
-color:white;
-overflow:hidden;
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    /* Если захочешь картинку от Nano Banana 2, раскомментируй строку ниже и удали градиенты: */
+    /* background: url('твоя_ссылка_на_картинку.jpg') center/cover; */
+    
+    background: linear-gradient(-45deg, #0d0e15, #1a2a6c, #112, #000000);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    color: white;
+    overflow-x: hidden;
+    user-select: none; /* Запрещаем выделение текста для эффекта "приложения" */
 }
 
 .container {
-padding:20px;
-animation: fadeIn 0.4s ease;
+    padding: 20px;
+    animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes fadeIn {
-from {opacity:0; transform:translateY(10px);}
-to {opacity:1; transform:translateY(0);}
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
 }
 
 .card {
-background: rgba(255,255,255,0.06);
-backdrop-filter: blur(14px);
-padding:18px;
-border-radius:20px;
-margin-bottom:12px;
-border:1px solid rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 20px;
+    border-radius: 24px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.money-container {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 5px;
 }
 
 .money {
-font-size:42px;
-font-weight:900;
-color:#00ff88;
+    font-size: 48px;
+    font-weight: 900;
+    color: #00ff88;
+    text-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
 }
 
 .stat {
-opacity:0.8;
-margin:6px 0;
+    font-size: 16px;
+    font-weight: 500;
+    opacity: 0.9;
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
 }
 
 button {
-width:100%;
-padding:14px;
-margin-top:10px;
-border-radius:14px;
-border:none;
-font-size:15px;
-font-weight:700;
-transition:0.2s;
+    width: 100%;
+    padding: 16px;
+    margin-top: 12px;
+    border-radius: 16px;
+    border: none;
+    font-size: 16px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.15s ease;
+    cursor: pointer;
 }
 
-button:active {transform:scale(0.97);}
+button:active {
+    transform: scale(0.95);
+}
 
-.sell {background:#00ff88;color:black;}
-.up {background:#1a1a1a;color:white;border:1px solid #00ff88;}
-.ref {background:#111;color:white;border:1px solid #333;}
+.sell {
+    background: #00ff88;
+    color: #000;
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+}
+
+.up {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid #00ff88;
+}
+
+.ref {
+    background: linear-gradient(90deg, #1a1a1a, #222);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
 
 .progress {
-height:6px;
-background:#222;
-border-radius:10px;
-overflow:hidden;
-margin-top:8px;
+    height: 8px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 15px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
 }
 
 .bar {
-height:100%;
-width:40%;
-background:#00ff88;
+    height: 100%;
+    width: 40%;
+    background: #00ff88;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #00ff88;
+    transition: width 0.3s ease;
 }
 
-.lb-title {
-margin-top:15px;
-font-weight:800;
-opacity:0.8;
+.lb-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.lb-item:last-child {
+    border-bottom: none;
+}
+.lb-name {
+    font-weight: 600;
+}
+.lb-score {
+    color: #00ff88;
+    font-weight: 800;
 }
 
 </style>
@@ -89,83 +155,135 @@ opacity:0.8;
 
 <div class="container">
 
-<div class="card">
-<div id="name">Player</div>
-<div class="money">$<span id="money">0</span></div>
-</div>
+    <div class="card">
+        <div id="name" style="font-weight: 600; opacity: 0.7; font-size: 14px;">Player</div>
+        <div class="money-container">
+            <span style="font-size: 24px; color: #00ff88;">$</span>
+            <div class="money" id="money">0.00</div>
+        </div>
+    </div>
 
-<div class="card">
-<div class="stat">⛽ Fuel: <span id="fuel">0</span></div>
-<div class="stat">🛢 Oil: <span id="oil">0</span></div>
-<div class="stat">⬆ Level: <span id="level">1</span></div>
+    <div class="card">
+        <div class="stat"><span>⛽ Fuel:</span> <span id="fuel" style="font-weight: 700;">0.00</span></div>
+        <div class="stat"><span>🛢 Oil:</span> <span id="oil" style="font-weight: 700;">0.00</span></div>
+        <div class="stat"><span>⬆ Level:</span> <span id="level" style="font-weight: 700; color: #00ff88;">1</span></div>
+        <div class="progress"><div class="bar" id="lvl-bar"></div></div>
+    </div>
 
-<div class="progress"><div class="bar"></div></div>
-</div>
+    <button class="sell" onclick="sell()">Sell Fuel</button>
+    <button class="up" onclick="upgrade()">Upgrade Station</button>
+    
+    <div style="display: flex; gap: 10px;">
+        <button class="ref" onclick="copyRef()">Copy Ref</button>
+        <button class="ref" onclick="loadLB()">Top 10 🏆</button>
+    </div>
 
-<button class="sell" onclick="sell()">SELL FUEL</button>
-<button class="up" onclick="upgrade()">UPGRADE</button>
-<button class="ref" onclick="copyRef()">REF LINK</button>
-<button class="up" onclick="loadLB()">LEADERBOARD</button>
-
-<div id="lb"></div>
+    <div id="lb" style="margin-top: 15px;"></div>
 
 </div>
 
 <script>
-
+// Инициализация Telegram
 const tg = window.Telegram.WebApp;
 tg.expand();
+tg.ready();
 
 const user = tg.initDataUnsafe?.user;
-const user_id = user?.id;
+const user_id = user?.id || 123456789; // Fallback для тестов в браузере
+const first_name = user?.first_name || "Player";
 
-document.getElementById("name").innerText = user?.first_name || "Player";
+document.getElementById("name").innerText = first_name;
 
 const API = "https://bot-kxfw.onrender.com";
 
-async function sync(){
-let r = await fetch(API+"/sync?user_id="+user_id);
-let d = await r.json();
+// --- Логика рефералов при запуске ---
+const start_param = tg.initDataUnsafe?.start_param;
+if (start_param && start_param != user_id) {
+    // Тихо отправляем запрос на привязку реферала
+    fetch(`${API}/ref?user_id=${user_id}&ref_id=${start_param}`).catch(e => console.log(e));
+}
 
-document.getElementById("money").innerText = d.money.toFixed(2);
-document.getElementById("fuel").innerText = d.fuel.toFixed(2);
-document.getElementById("oil").innerText = d.oil.toFixed(2);
-document.getElementById("level").innerText = d.level;
+// Вибрация (Haptic Feedback) для тактильности
+function vibe(type = 'light') {
+    tg.HapticFeedback.impactOccurred(type);
+}
+
+async function sync(){
+    // Передаем имя пользователя при синхронизации
+    let r = await fetch(`${API}/sync?user_id=${user_id}&name=${encodeURIComponent(first_name)}`);
+    let d = await r.json();
+
+    document.getElementById("money").innerText = d.money.toFixed(2);
+    document.getElementById("fuel").innerText = d.fuel.toFixed(2);
+    document.getElementById("oil").innerText = d.oil.toFixed(2);
+    document.getElementById("level").innerText = d.level;
+    
+    // Анимация полоски прогресса для красоты (зависит от уровня)
+    document.getElementById("lvl-bar").style.width = (d.level * 10) + "%";
 }
 
 async function sell(){
-await fetch(API+"/sell?user_id="+user_id,{method:"POST"});
-sync();
+    vibe('medium');
+    let btn = document.querySelector('.sell');
+    btn.innerText = "Selling...";
+    
+    await fetch(`${API}/sell?user_id=${user_id}`, {method:"POST"});
+    await sync();
+    
+    btn.innerText = "Sell Fuel";
+    vibe('rigid');
 }
 
 async function upgrade(){
-await fetch(API+"/upgrade?user_id="+user_id,{method:"POST"});
-sync();
+    vibe('heavy');
+    await fetch(`${API}/upgrade?user_id=${user_id}`, {method:"POST"});
+    sync();
 }
 
 function copyRef(){
-const link = `https://t.me/YOUR_BOT?start=${user_id}`;
-navigator.clipboard.writeText(link);
-tg.showAlert("Copied!");
+    vibe('light');
+    // ВАЖНО: замени YOUR_BOT_USERNAME на реальный @username твоего бота
+    const link = `https://t.me/@FuelTycoon_bot?start=${user_id}`;
+    
+    // Современный способ копирования
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(link).then(() => {
+            tg.showAlert("Реферальная ссылка скопирована! Отправь её друзьям.");
+        });
+    } else {
+        // Fallback если буфер недоступен
+        let textArea = document.createElement("textarea");
+        textArea.value = link;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("Copy");
+        textArea.remove();
+        tg.showAlert("Реферальная ссылка скопирована!");
+    }
 }
 
 async function loadLB(){
-let r = await fetch(API+"/leaderboard");
-let data = await r.json();
+    vibe('light');
+    let r = await fetch(API+"/leaderboard");
+    let data = await r.json();
 
-let html = "<div class='card'><b>TOP PLAYERS</b></div>";
+    let html = "<div class='card'><div style='text-align:center; font-weight:800; margin-bottom:10px;'>🏆 TOP PLAYERS</div>";
 
-data.forEach((u, i) => {
-html += `
-<div class='card'>
-#${i+1} User ${u.user_id}<br>
-💰 $${Number(u.money).toFixed(2)}
-</div>`;
-});
-
-document.getElementById("lb").innerHTML = html;
+    data.forEach((u, i) => {
+        // Показываем u.name (которое мы добавили в БД)
+        let medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
+        html += `
+        <div class='lb-item'>
+            <div class='lb-name'>${medal} ${u.name || 'Unknown'}</div>
+            <div class='lb-score'>$${Number(u.money).toFixed(2)}</div>
+        </div>`;
+    });
+    
+    html += "</div>";
+    document.getElementById("lb").innerHTML = html;
 }
 
+// Запускаем цикл
 setInterval(sync, 4000);
 sync();
 
