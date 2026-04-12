@@ -10,14 +10,14 @@
 body {
 margin:0;
 font-family:system-ui;
-background: radial-gradient(circle at top, #0f0f0f, #000);
+background: radial-gradient(circle at top, #111, #000);
 color:white;
 overflow:hidden;
 }
 
 .container {
 padding:20px;
-animation: fadeIn 0.6s ease;
+animation: fadeIn 0.4s ease;
 }
 
 @keyframes fadeIn {
@@ -26,41 +26,23 @@ to {opacity:1; transform:translateY(0);}
 }
 
 .card {
-background: rgba(255,255,255,0.05);
-backdrop-filter: blur(12px);
-padding:16px;
-border-radius:18px;
+background: rgba(255,255,255,0.06);
+backdrop-filter: blur(14px);
+padding:18px;
+border-radius:20px;
 margin-bottom:12px;
-border:1px solid rgba(255,255,255,0.08);
-transition:0.3s;
-}
-
-.card:active {
-transform: scale(0.98);
-}
-
-.title {
-font-size:22px;
-font-weight:900;
+border:1px solid rgba(255,255,255,0.1);
 }
 
 .money {
-font-size:44px;
-color:#00ff88;
+font-size:42px;
 font-weight:900;
-animation: glow 2s infinite;
-}
-
-@keyframes glow {
-0% {text-shadow:0 0 5px #00ff88;}
-50% {text-shadow:0 0 20px #00ff88;}
-100% {text-shadow:0 0 5px #00ff88;}
+color:#00ff88;
 }
 
 .stat {
-font-size:16px;
+opacity:0.8;
 margin:6px 0;
-opacity:0.9;
 }
 
 button {
@@ -69,30 +51,29 @@ padding:14px;
 margin-top:10px;
 border-radius:14px;
 border:none;
-font-size:16px;
+font-size:15px;
 font-weight:700;
 transition:0.2s;
 }
 
-button:active {
-transform: scale(0.96);
+button:active {transform:scale(0.97);}
+
+.sell {background:#00ff88;color:black;}
+.up {background:#1a1a1a;color:white;border:1px solid #00ff88;}
+.ref {background:#111;color:white;border:1px solid #333;}
+
+.progress {
+height:6px;
+background:#222;
+border-radius:10px;
+overflow:hidden;
+margin-top:8px;
 }
 
-.sell {
+.bar {
+height:100%;
+width:40%;
 background:#00ff88;
-color:black;
-}
-
-.up {
-background:#111;
-color:#fff;
-border:1px solid #00ff88;
-}
-
-.ref {
-background:#1a1a1a;
-border:1px solid #444;
-color:white;
 }
 
 </style>
@@ -102,21 +83,22 @@ color:white;
 
 <div class="container">
 
-<div class="title" id="name">Player</div>
-
 <div class="card">
+<div id="name">Player</div>
 <div class="money">$<span id="money">0</span></div>
 </div>
 
 <div class="card">
-<div class="stat">⛽ Fuel: <span id="fuel">0</span></div>
-<div class="stat">🛢 Oil: <span id="oil">0</span></div>
-<div class="stat">⬆ Level: <span id="level">1</span></div>
+<div class="stat">⛽ Fuel: <span id="fuel"></span></div>
+<div class="stat">🛢 Oil: <span id="oil"></span></div>
+<div class="stat">⬆ Level: <span id="level"></span></div>
+
+<div class="progress"><div class="bar"></div></div>
 </div>
 
-<button class="sell" onclick="sell()">SELL</button>
+<button class="sell" onclick="sell()">SELL FUEL</button>
 <button class="up" onclick="upgrade()">UPGRADE</button>
-<button class="ref" onclick="copyRef()">COPY REF LINK</button>
+<button class="ref" onclick="copyRef()">REF LINK</button>
 
 </div>
 
@@ -155,10 +137,10 @@ sync();
 function copyRef(){
 const link = `https://t.me/YOUR_BOT?start=${user_id}`;
 navigator.clipboard.writeText(link);
-tg.showAlert("Referral copied!");
+tg.showAlert("Copied!");
 }
 
-setInterval(sync, 3000);
+setInterval(sync, 4000);
 sync();
 
 </script>
