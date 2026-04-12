@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gas Station Tycoon</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #1a1a1a; color: white; text-align: center; margin-top: 50px; }
+        .stat-card { background: #333; padding: 20px; border-radius: 15px; margin: 10px; border: 1px solid #ff9900; }
+        .btn { background: #ff9900; border: none; padding: 15px 30px; border-radius: 10px; color: black; font-weight: bold; cursor: pointer; }
+        .oil-bar { width: 80%; background: #555; height: 20px; border-radius: 10px; margin: 10px auto; overflow: hidden; }
+        .oil-fill { width: 30%; background: #ff9900; height: 100%; transition: width 0.5s; }
+    </style>
+</head>
+<body>
+    <h2 id="userName">Заправка Егора</h2>
+    
+    <div class="stat-card">
+        <p>💵 Баланс: <span id="balance">$0.00</span></p>
+        <p>⛽ Топливо: <span id="fuel">0.00 л.</span></p>
+        <div class="oil-bar"><div class="oil-fill" id="oilFill"></div></div>
+    </div>
+
+    <button class="btn" onclick="sellFuel()">💵 ПРОДАТЬ ТОПЛИВО</button>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand(); // Развернуть на весь экран
+
+        // Берем имя игрока из ТГ
+        document.getElementById('userName').innerText = `Заправка ${tg.initDataUnsafe.user.first_name}`;
+
+        function sellFuel() {
+            // Отправляем боту команду, что мы нажали кнопку в приложении
+            tg.sendData("sell_fuel_trigger"); 
+            tg.close(); // Закрыть приложение после продажи (или оставить)
+        }
+    </script>
+</body>
+</html>
