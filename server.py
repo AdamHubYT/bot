@@ -145,3 +145,25 @@ def ref(user_id: int, ref_id: int):
     }).eq("user_id", ref_id).execute()
 
     return {"ok": True}
+
+# ДОБАВЬ ЭТОТ КОД В SERVER.PY К ОСТАЛЬНЫМ ЭНДПОИНТАМ (@app.route)
+
+@app.route('/process', methods=['POST'])
+def process_oil():
+    user_id = request.args.get('user_id')
+    conn = get_db_connection()
+    c = conn.cursor()
+    
+    c.execute("SELECT oil FROM users WHERE user_id=?", (user_id,))
+    row = c.fetchone()
+    
+    if row and row['oil'] > 0:
+        oil_amount = row['oil']
+        # Конвертация: 10 нефти = 1 топливо (меняй коэффициент на свой вкус)
+        fuel_gained = oil_amount / 10.0 
+        
+        c.execute("UPDATE users SET oil=0, fuel=fuel+? WHERE user_id=?", (fuel_gained, user_id))
+        conn.commit()
+        
+    conn.close()
+    return jsonify({"status": "processed"})
