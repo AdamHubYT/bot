@@ -147,7 +147,6 @@ def ref(user_id: int, ref_id: int):
     return {"ok": True}
 
 # ДОБАВЬ ЭТОТ КОД В SERVER.PY К ОСТАЛЬНЫМ ЭНДПОИНТАМ (@app.route)
-
 @app.route('/process', methods=['POST'])
 def process_oil():
     user_id = request.args.get('user_id')
