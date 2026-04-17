@@ -19,9 +19,9 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ---------------- ECONOMY ----------------
-BASE_OIL_PER_HOUR = 2  # Увеличил, чтобы было что перерабатывать
-FUEL_PER_OIL = 0.1     # 10 нефти = 1 топливо
-FUEL_PRICE = 5.0       # Цена за единицу топлива
+BASE_OIL_PER_HOUR = 2
+FUEL_PER_OIL = 0.1
+FUEL_PRICE = 5.0
 MAX_LEVEL = 10
 
 # ---------------- USER ----------------
@@ -37,6 +37,7 @@ def get_user(user_id: int, name: str = "Player"):
             "oil": 0,
             "level": 1,
             "ref_bonus": 0,
+            "last_bonus": 0, # Добавлено для бонуса
             "last_update": int(time.time())
         }
         supabase.table("users").insert(user).execute()
@@ -57,7 +58,6 @@ def apply_offline(user):
     delta = min(max(0, now - last), 86400) # Максимум 24 часа
     hours = delta / 3600
 
-    # Теперь оффлайн добывается ТОЛЬКО нефть, которую надо потом переработать
     oil_gain = hours * BASE_OIL_PER_HOUR * user["level"]
     oil_gain *= (1 + user.get("ref_bonus", 0))
 
@@ -72,15 +72,42 @@ def apply_offline(user):
 def sync(user_id: int, name: str = "Player"):
     user = get_user(user_id, name)
     apply_offline(user)
-    return get_user(user_id, name)
+    
+    # Снова берем данные, чтобы учесть оффлайн-начисления
+    fresh_user = get_user(user_id, name)
+    
+    # Проверка: можно ли забрать бонус? (86400 сек = 24 часа)
+    now = int(time.time())
+    last_b = fresh_user.get("last_bonus", 0)
+    fresh_user["can_claim_bonus"] = (now - last_b) >= 86400
+    
+    return fresh_user
+
+@app.post("/daily")
+def claim_daily(user_id: int):
+    user = get_user(user_id)
+    now = int(time.time())
+    last_b = user.get("last_bonus", 0)
+    
+    # Если 24 часа еще не прошло
+    if (now - last_b) < 86400:
+        return {"ok": False, "message": "Бонус еще не готов!"}
+
+    reward_money = 50
+    reward_fuel = 10
+    
+    supabase.table("users").update({
+        "money": user["money"] + reward_money,
+        "fuel": user["fuel"] + reward_fuel,
+        "last_bonus": now
+    }).eq("user_id", user_id).execute()
+
+    return {"ok": True, "reward_money": reward_money, "reward_fuel": reward_fuel}
 
 @app.post("/process")
 def process_oil(user_id: int):
     user = get_user(user_id)
-    # Можно вызвать оффлайн добычу перед переработкой, чтобы собрать всё до капли
     apply_offline(user)
-    
-    # Снова берем данные после оффлайна
     user = get_user(user_id)
     
     if user["oil"] > 0:
@@ -91,15 +118,12 @@ def process_oil(user_id: int):
             "oil": 0,
             "fuel": user["fuel"] + fuel_gained
         }).eq("user_id", user_id).execute()
-        
         return {"ok": True, "status": "processed", "gained": fuel_gained}
-    
     return {"ok": False, "message": "No oil to process"}
 
 @app.post("/sell")
 def sell(user_id: int):
     user = get_user(user_id)
-    
     if user["fuel"] > 0:
         money_gain = user["fuel"] * FUEL_PRICE
         supabase.table("users").update({
@@ -107,16 +131,13 @@ def sell(user_id: int):
             "fuel": 0
         }).eq("user_id", user_id).execute()
         return {"ok": True, "gained": money_gain}
-    
     return {"ok": False, "message": "No fuel to sell"}
 
 @app.post("/upgrade")
 def upgrade(user_id: int):
     user = get_user(user_id)
-
     if user["level"] >= MAX_LEVEL:
         return {"ok": False, "message": "Max level reached"}
-
     cost = user["level"] * 250
     if user["money"] < cost:
         return {"ok": False, "message": "Not enough money"}
@@ -125,7 +146,6 @@ def upgrade(user_id: int):
         "money": user["money"] - cost,
         "level": user["level"] + 1
     }).eq("user_id", user_id).execute()
-
     return {"ok": True}
 
 @app.get("/leaderboard")
@@ -141,14 +161,11 @@ def leaderboard():
 def ref(user_id: int, ref_id: int):
     if user_id == ref_id:
         return {"ok": False}
-
     ref_user = get_user(ref_id)
     new_bonus = min(ref_user.get("ref_bonus", 0) + 0.01, 0.20)
-
     supabase.table("users").update({
         "ref_bonus": new_bonus
     }).eq("user_id", ref_id).execute()
-
     return {"ok": True}
 
 if __name__ == "__main__":
