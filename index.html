@@ -6,8 +6,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
-        /* === КОНСТРУКТОР ДИЗАЙНА === */
-        /* Меняй значения здесь, чтобы быстро перекрасить всю игру */
         :root {
             --bg-color-1: #0d0e15;
             --bg-color-2: #1a2a6c;
@@ -16,7 +14,6 @@
             
             --accent-main: #00ff88;
             --accent-main-dark: #00cc6a;
-            
             --accent-process: #f39c12;
             --accent-process-dark: #e67e22;
             
@@ -27,19 +24,25 @@
             --text-color: #ffffff;
         }
 
-        /* Базовые стили и анимированный фон (Старый любимый дизайн) */
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
 
+        /* Настройка фона. Читай гайд ниже! */
         body {
             margin: 0;
             font-family: 'Segoe UI', system-ui, sans-serif;
+            
+            /* Если хочешь картинку на фон, раскомментируй строку ниже и вставь ссылку: */
+            /* background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.8)), url('ССЫЛКА_НА_КАРТИНКУ.jpg') center/cover no-repeat fixed; */
+            
+            /* Анимированный градиент по умолчанию: */
             background: linear-gradient(-45deg, var(--bg-color-1), var(--bg-color-2), var(--bg-color-3), var(--bg-color-4));
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
+            
             color: var(--text-color);
             overflow-x: hidden;
             user-select: none;
@@ -50,18 +53,17 @@
 
         .container {
             padding: 15px;
-            animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            animation: fadeIn 0.4s ease;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
         }
 
         @keyframes fadeIn {
-            from {opacity: 0; transform: translateY(20px);}
+            from {opacity: 0; transform: translateY(10px);}
             to {opacity: 1; transform: translateY(0);}
         }
 
-        /* --- ВЕРХНЯЯ НАВИГАЦИЯ (Профиль и Бонус) --- */
         .header-nav {
             display: flex;
             justify-content: space-between;
@@ -91,18 +93,15 @@
             border-color: rgba(255, 204, 0, 0.3);
         }
 
-        /* --- ПАНЕЛЬ СТАТИСТИКИ (Стекло) --- */
         .top-stats-panel {
             background: var(--glass-bg);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             border-radius: var(--radius);
             padding: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border: 1px solid var(--glass-border);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             margin-bottom: 20px;
         }
 
@@ -117,7 +116,6 @@
             font-weight: 800;
             font-size: 18px;
             color: var(--accent-main);
-            text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
         }
         
         .stat-label {
@@ -128,7 +126,6 @@
             margin-bottom: 4px;
         }
 
-        /* --- ЦЕНТРАЛЬНАЯ АНИМАЦИЯ --- */
         .animation-container {
             flex-grow: 1;
             display: flex;
@@ -142,17 +139,16 @@
             max-width: 80%;
             max-height: 260px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 136, 0.2);
-            animation: pulseImg 4s infinite ease-in-out alternate;
-            mix-blend-mode: screen; /* Убирает черный фон у GIF */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: pulseImg 4s infinite alternate;
+            mix-blend-mode: screen; 
         }
 
         @keyframes pulseImg {
-            0% { transform: scale(0.98); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 255, 136, 0.1); }
-            100% { transform: scale(1.02); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 35px rgba(0, 255, 136, 0.4); }
+            0% { transform: scale(0.98); }
+            100% { transform: scale(1.02); }
         }
 
-        /* --- БАЛАНС --- */
         .money-display {
             text-align: center;
             margin-bottom: 20px;
@@ -161,11 +157,8 @@
         .money-val {
             font-size: 46px;
             font-weight: 900;
-            color: white;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
-        /* --- КНОПКИ --- */
         .controls { margin-top: auto; }
 
         button {
@@ -173,12 +166,10 @@
             padding: 16px;
             border-radius: var(--radius);
             border: none;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.15s ease;
-            cursor: pointer;
+            transition: 0.15s;
         }
 
         button:active { transform: scale(0.96); }
@@ -186,14 +177,12 @@
         .btn-process {
             background: linear-gradient(135deg, var(--accent-process), var(--accent-process-dark));
             color: #fff;
-            box-shadow: 0 5px 20px rgba(243, 156, 18, 0.4);
             margin-bottom: 10px;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--accent-main), var(--accent-main-dark));
             color: #000;
-            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
             margin-bottom: 10px;
         }
 
@@ -210,7 +199,6 @@
             margin-top: 10px;
         }
 
-        /* --- ПАНЕЛИ И ЭКРАНЫ --- */
         .panel {
             display: none; 
             background: rgba(10, 15, 30, 0.95);
@@ -234,7 +222,6 @@
         }
         .screen.active { display: flex; }
 
-        /* Карточки внутри экранов */
         .info-card {
             background: var(--glass-bg);
             padding: 20px;
@@ -248,8 +235,20 @@
             justify-content: space-between;
             padding: 12px 0;
             border-bottom: 1px solid rgba(255,255,255,0.05);
+            align-items: center;
         }
         .info-row:last-child { border-bottom: none; }
+
+        /* Таблица лидеров стили */
+        .lb-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .lb-item:last-child { border-bottom: none; }
+        .lb-name { font-weight: bold; }
+        .lb-score { color: var(--accent-main); font-weight: 800; }
 
     </style>
 </head>
@@ -262,24 +261,24 @@
         
         <div class="header-nav">
             <div class="nav-btn btn-bonus" onclick="claimDaily()">
-                🎁 Бонус
+                <span id="txt-bonus">🎁 Бонус</span>
             </div>
             <div class="nav-btn" onclick="switchScreen('screen-profile')">
-                👤 Профиль
+                <span data-i18n="profile">👤 Профиль</span>
             </div>
         </div>
 
         <div class="top-stats-panel">
             <div class="stat-item">
-                <span class="stat-label">Сырая нефть</span>
+                <span class="stat-label" data-i18n="oil">Сырая нефть</span>
                 <span class="stat-value" id="oil">0.00</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Топливо</span>
+                <span class="stat-label" data-i18n="fuel">Топливо</span>
                 <span class="stat-value" id="fuel">0.00</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Уровень</span>
+                <span class="stat-label" data-i18n="level">Уровень</span>
                 <span class="stat-value" id="level" style="color: white;">1</span>
             </div>
         </div>
@@ -289,39 +288,42 @@
         </div>
 
         <div class="money-display">
-            <div class="stat-label">Твой Капитал</div>
+            <div class="stat-label" data-i18n="capital">Твой Капитал</div>
             <div class="money-val">$<span id="money">0.00</span></div>
         </div>
 
         <div id="upgrade-panel" class="panel">
-            <h3 style="text-align: center; color: var(--accent-main); margin-top: 0;">Апгрейд Станции</h3>
+            <h3 style="text-align: center; color: var(--accent-main); margin-top: 0;" data-i18n="upgradeTitle">Апгрейд Станции</h3>
             <div style="text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 15px;">-$<span id="upgrade-cost-val">250</span></div>
             <div class="btn-group">
-                <button class="btn-primary" onclick="confirmUpgrade()" style="margin:0;">Улучшить</button>
-                <button class="btn-secondary" onclick="hideUpgradePanel()" style="margin:0;">Отмена</button>
+                <button class="btn-primary" onclick="confirmUpgrade()" style="margin:0;" data-i18n="upgradeBtn">Улучшить</button>
+                <button class="btn-secondary" onclick="hideUpgradePanel()" style="margin:0;" data-i18n="cancelBtn">Отмена</button>
             </div>
         </div>
 
         <div class="controls" id="main-controls">
-            <button class="btn-process" onclick="processOil()">Переработать (10 🛢 = 1 ⛽)</button>
-            <button class="btn-primary" onclick="sell()">Продать топливо (1 ⛽ = $5)</button>
+            <button class="btn-process" onclick="processOil()" id="btn-process-text" data-i18n="processBtn">Переработать (10 🛢 = 1 ⛽)</button>
+            <button class="btn-primary" onclick="sell()" id="btn-sell-text" data-i18n="sellBtn">Продать топливо (1 ⛽ = $5)</button>
             
             <div class="btn-group">
-                <button class="btn-secondary" onclick="showUpgradePanel()">Апгрейд ⬆️</button>
-                <button class="btn-secondary" onclick="switchScreen('screen-ref')">Рефералы 👥</button>
+                <button class="btn-secondary" onclick="showUpgradePanel()" data-i18n="upgradeMenu">Апгрейд ⬆️</button>
+                <button class="btn-secondary" onclick="switchScreen('screen-ref')" data-i18n="refMenu">Рефералы 👥</button>
+            </div>
+            <div class="btn-group">
+                <button class="btn-secondary" onclick="openLeaderboard()" data-i18n="topMenu">Топ 10 Игроков 🏆</button>
             </div>
         </div>
     </div>
 
     <div id="screen-profile" class="screen">
         <div class="header-nav" style="justify-content: flex-start;">
-            <div class="nav-btn" onclick="switchScreen('screen-main')">◀ Назад</div>
+            <div class="nav-btn" onclick="switchScreen('screen-main')" data-i18n="backBtn">◀ Назад</div>
         </div>
         
         <div class="info-card">
-            <h2 style="margin-top: 0; color: var(--accent-main); text-align: center;">Личное Дело</h2>
+            <h2 style="margin-top: 0; color: var(--accent-main); text-align: center;" data-i18n="profileTitle">Личное Дело</h2>
             <div class="info-row">
-                <span style="opacity: 0.7;">Игрок</span>
+                <span style="opacity: 0.7;" data-i18n="player">Игрок</span>
                 <span id="prof-name" style="font-weight: bold;">...</span>
             </div>
             <div class="info-row">
@@ -329,37 +331,103 @@
                 <span id="prof-id" style="font-weight: bold;">...</span>
             </div>
             <div class="info-row">
-                <span style="opacity: 0.7;">Дата регистрации</span>
-                <span style="font-weight: bold;">Сегодня</span>
+                <span style="opacity: 0.7;" data-i18n="power">Мощность вышки</span>
+                <span id="prof-level" style="font-weight: bold; color: var(--accent-main);">Ур. 1</span>
             </div>
             <div class="info-row">
-                <span style="opacity: 0.7;">Мощность вышки</span>
-                <span id="prof-level" style="font-weight: bold; color: var(--accent-main);">Ур. 1</span>
+                <span style="opacity: 0.7;" data-i18n="langLabel">Язык / Language</span>
+                <button class="btn-secondary" style="width: auto; padding: 6px 12px; margin: 0;" id="lang-toggle-btn" onclick="toggleLanguage()">🇷🇺 RU</button>
             </div>
         </div>
     </div>
 
     <div id="screen-ref" class="screen">
         <div class="header-nav" style="justify-content: flex-start;">
-            <div class="nav-btn" onclick="switchScreen('screen-main')">◀ Назад</div>
+            <div class="nav-btn" onclick="switchScreen('screen-main')" data-i18n="backBtn">◀ Назад</div>
         </div>
         
         <div class="info-card" style="text-align: center;">
-            <div class="stat-label">Бонус от партнеров</div>
+            <div class="stat-label" data-i18n="refTitle">Бонус от партнеров</div>
             <div style="font-size: 38px; font-weight: bold; color: var(--accent-main); margin: 10px 0;">+<span id="ref-bonus-val">0</span>%</div>
-            <p style="font-size: 13px; opacity: 0.8; line-height: 1.5;">
-                Построй свою империю!<br>Каждый друг дает +1% к скорости выработки нефти (максимум 20%).
+            <p style="font-size: 13px; opacity: 0.8; line-height: 1.5;" id="ref-desc" data-i18n="refDesc">
+                Построй свою империю!<br>Каждый друг дает +1% к скорости выработки нефти (макс 20%).
             </p>
         </div>
 
         <div class="controls">
-            <button class="btn-primary" onclick="copyRef()">Скопировать ссылку</button>
+            <button class="btn-primary" onclick="copyRef()" data-i18n="copyBtn">Скопировать ссылку</button>
+        </div>
+    </div>
+
+    <div id="screen-lb" class="screen">
+        <div class="header-nav" style="justify-content: flex-start;">
+            <div class="nav-btn" onclick="switchScreen('screen-main')" data-i18n="backBtn">◀ Назад</div>
+        </div>
+        
+        <div class="info-card">
+            <h2 style="margin-top: 0; color: var(--accent-main); text-align: center;" data-i18n="lbTitle">🏆 ТОП 10 ОЛИГАРХОВ</h2>
+            <div id="lb-list">
+                <div style="text-align:center; opacity:0.5;">Загрузка...</div>
+            </div>
         </div>
     </div>
 
 </div>
 
 <script>
+// --- МУЛЬТИЯЗЫЧНОСТЬ ---
+const translations = {
+    ru: {
+        bonus: "🎁 Бонус", wait: "⏳ Жди 24ч", profile: "👤 Профиль",
+        oil: "Сырая нефть", fuel: "Топливо", level: "Уровень", capital: "Твой Капитал",
+        upgradeTitle: "Апгрейд Станции", upgradeBtn: "Улучшить", cancelBtn: "Отмена",
+        processBtn: "Переработать (10 🛢 = 1 ⛽)", sellBtn: "Продать топливо (1 ⛽ = $5)",
+        upgradeMenu: "Апгрейд ⬆️", refMenu: "Рефералы 👥", topMenu: "Топ 10 Игроков 🏆",
+        backBtn: "◀ Назад", profileTitle: "Личное Дело", player: "Игрок", power: "Мощность вышки",
+        langLabel: "Язык / Language", refTitle: "Бонус от партнеров",
+        refDesc: "Построй свою империю!<br>Каждый друг дает +1% к скорости выработки нефти (макс 20%).",
+        copyBtn: "Скопировать ссылку", lbTitle: "🏆 ТОП 10 ОЛИГАРХОВ",
+        sysNoMoney: "Не хватает долларов!", sysUpgraded: "🚀 Вышка прокачана до", sysCopied: "Ссылка скопирована!"
+    },
+    en: {
+        bonus: "🎁 Bonus", wait: "⏳ Wait 24h", profile: "👤 Profile",
+        oil: "Crude Oil", fuel: "Fuel", level: "Level", capital: "Your Capital",
+        upgradeTitle: "Station Upgrade", upgradeBtn: "Upgrade", cancelBtn: "Cancel",
+        processBtn: "Process (10 🛢 = 1 ⛽)", sellBtn: "Sell Fuel (1 ⛽ = $5)",
+        upgradeMenu: "Upgrade ⬆️", refMenu: "Referrals 👥", topMenu: "Top 10 Players 🏆",
+        backBtn: "◀ Back", profileTitle: "Dossier", player: "Player", power: "Rig Power",
+        langLabel: "Language / Язык", refTitle: "Partner Bonus",
+        refDesc: "Build your empire!<br>Each friend gives +1% to oil production speed (max 20%).",
+        copyBtn: "Copy Link", lbTitle: "🏆 TOP 10 TYCOONS",
+        sysNoMoney: "Not enough dollars!", sysUpgraded: "🚀 Rig upgraded to", sysCopied: "Link copied!"
+    }
+};
+
+let currentLang = 'ru';
+
+function toggleLanguage() {
+    vibe('light');
+    currentLang = currentLang === 'ru' ? 'en' : 'ru';
+    document.getElementById('lang-toggle-btn').innerText = currentLang === 'ru' ? '🇷🇺 RU' : '🇬🇧 EN';
+    
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        let key = el.getAttribute('data-i18n');
+        if(translations[currentLang][key]) {
+            el.innerHTML = translations[currentLang][key]; 
+        }
+    });
+    
+    // Обновляем текст кнопки бонуса вручную (т.к. у нее динамическое состояние)
+    let btnBonus = document.querySelector('.btn-bonus');
+    if(btnBonus.style.opacity === '0.5') {
+        document.getElementById('txt-bonus').innerText = translations[currentLang].wait;
+    } else {
+        document.getElementById('txt-bonus').innerText = translations[currentLang].bonus;
+    }
+}
+
+function t(key) { return translations[currentLang][key]; } // Помощник для алертов
+
 // --- ИНИЦИАЛИЗАЦИЯ ---
 const tg = window.Telegram.WebApp;
 tg.expand();
@@ -386,7 +454,7 @@ function switchScreen(screenId) {
     document.getElementById(screenId).classList.add('active');
 }
 
-// --- СИНХРОНИЗАЦИЯ С БЭКОМ ---
+// --- СИНХРОНИЗАЦИЯ ---
 async function sync(){
     try {
         let r = await fetch(`${API}/sync?user_id=${user_id}&name=${encodeURIComponent(first_name)}`);
@@ -395,58 +463,64 @@ async function sync(){
         currentLevel = d.level;
         currentMoney = d.money;
 
-        // Анимация начисления (опционально, делает цифры живыми)
         document.getElementById("money").innerText = d.money.toFixed(2);
         document.getElementById("fuel").innerText = d.fuel.toFixed(2);
         document.getElementById("oil").innerText = d.oil.toFixed(2);
         document.getElementById("level").innerText = d.level;
-        document.getElementById("prof-level").innerText = "Ур. " + d.level;
+        document.getElementById("prof-level").innerText = (currentLang === 'ru' ? "Ур. " : "Lvl. ") + d.level;
         
         let bonusPercent = Math.round((d.ref_bonus || 0) * 100);
         document.getElementById("ref-bonus-val").innerText = bonusPercent;
+
+        // Логика кнопки бонуса
+        let btnBonus = document.querySelector('.btn-bonus');
+        let txtBonus = document.getElementById('txt-bonus');
+        if (d.can_claim_bonus) {
+            btnBonus.style.opacity = '1';
+            txtBonus.innerText = t('bonus');
+        } else {
+            btnBonus.style.opacity = '0.5';
+            txtBonus.innerText = t('wait');
+        }
     } catch (e) { console.error("Sync error", e); }
 }
 
-// --- ИГРОВЫЕ МЕХАНИКИ ---
+// --- ДЕЙСТВИЯ ---
+async function claimDaily() {
+    vibe('heavy');
+    let btn = document.querySelector('.btn-bonus');
+    if (btn.style.opacity === '0.5') {
+        tg.showAlert(currentLang === 'ru' ? "Бонус еще не готов!" : "Bonus is not ready yet!");
+        return;
+    }
+
+    try {
+        let r = await fetch(`${API}/daily?user_id=${user_id}`, { method: "POST" });
+        let d = await r.json();
+
+        if (d.ok) {
+            tg.showAlert(currentLang === 'ru' ? `🎁 Получено: +$${d.reward_money} и +${d.reward_fuel} топлива!` : `🎁 Claimed: +$${d.reward_money} & +${d.reward_fuel} fuel!`);
+            await sync();
+        } else { tg.showAlert(d.message); }
+    } catch (e) {}
+}
+
 async function processOil(){
     vibe('medium');
-    let btn = document.querySelector('.btn-process');
-    let originalText = btn.innerText;
-    btn.innerText = "⚙️ Переработка...";
-    
-    try {
-        await fetch(`${API}/process?user_id=${user_id}`, {method:"POST"});
-        await sync();
-    } catch(e) {}
-    
-    setTimeout(() => btn.innerText = originalText, 500);
+    let btnText = document.getElementById('btn-process-text');
+    let orig = btnText.innerText;
+    btnText.innerText = "⚙️...";
+    try { await fetch(`${API}/process?user_id=${user_id}`, {method:"POST"}); await sync(); } catch(e) {}
+    setTimeout(() => btnText.innerText = orig, 500);
 }
 
 async function sell(){
     vibe('medium');
-    let btn = document.querySelector('.btn-primary');
-    let originalText = btn.innerText;
-    btn.innerText = "💵 Продажа...";
-    
-    try {
-        await fetch(`${API}/sell?user_id=${user_id}`, {method:"POST"});
-        await sync();
-    } catch(e) {}
-    
-    setTimeout(() => btn.innerText = originalText, 500);
-}
-
-// --- ЕЖЕДНЕВНЫЙ БОНУС (UI СИМУЛЯЦИЯ) ---
-function claimDaily() {
-    vibe('heavy');
-    // В будущем тут должен быть запрос к твоему Python-серверу: fetch(`${API}/daily...`)
-    tg.showAlert("🎁 Ежедневная награда!\n\nТы получил +10 Топлива и +$50.\nВозвращайся завтра, чтобы награда стала больше!");
-    
-    // Временная визуальная блокировка кнопки
-    let btn = document.querySelector('.btn-bonus');
-    btn.style.opacity = '0.5';
-    btn.innerText = "⏳ Жди 24ч";
-    btn.onclick = () => tg.showAlert("Бонус уже получен сегодня!");
+    let btnText = document.getElementById('btn-sell-text');
+    let orig = btnText.innerText;
+    btnText.innerText = "💵...";
+    try { await fetch(`${API}/sell?user_id=${user_id}`, {method:"POST"}); await sync(); } catch(e) {}
+    setTimeout(() => btnText.innerText = orig, 500);
 }
 
 // --- АПГРЕЙДЫ И ПРОЧЕЕ ---
@@ -456,7 +530,6 @@ function showUpgradePanel() {
     document.getElementById('upgrade-cost-val').innerText = cost;
     document.getElementById('main-controls').style.display = 'none';
     document.getElementById('upgrade-panel').style.display = 'block';
-    
     if (currentMoney < cost) document.getElementById('upgrade-cost-val').style.color = '#ff4444';
     else document.getElementById('upgrade-cost-val').style.color = 'white';
 }
@@ -470,37 +543,27 @@ function hideUpgradePanel() {
 async function confirmUpgrade(){
     const cost = currentLevel * 250;
     if (currentMoney < cost) {
-        tg.showAlert("Не хватает долларов для улучшения!");
-        vibe('heavy');
-        return;
+        tg.showAlert(t('sysNoMoney')); vibe('heavy'); return;
     }
     vibe('heavy');
     await fetch(`${API}/upgrade?user_id=${user_id}`, {method:"POST"});
     await sync();
     hideUpgradePanel();
-    tg.showAlert(`🚀 Вышка прокачана до ${currentLevel} уровня!`);
+    tg.showAlert(`${t('sysUpgraded')} ${currentLevel}!`);
 }
 
-function copyRef(){
-    vibe('medium');
-    const link = `https://t.me/FuelTycoon_bot?start=${user_id}`;
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(link).then(() => tg.showAlert("Ссылка скопирована!"));
-    } else {
-        let textArea = document.createElement("textarea");
-        textArea.value = link;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand("Copy");
-        textArea.remove();
-        tg.showAlert("Ссылка скопирована!");
-    }
-}
-
-// Запуск интервала синхронизации
-setInterval(sync, 3000); // ускорил обновление до 3 сек для динамики
-sync();
-
-</script>
-</body>
-</html>
+async function openLeaderboard() {
+    switchScreen('screen-lb');
+    document.getElementById('lb-list').innerHTML = '<div style="text-align:center; opacity:0.5;">Loading...</div>';
+    try {
+        let r = await fetch(API+"/leaderboard");
+        let data = await r.json();
+        let html = '';
+        data.forEach((u, i) => {
+            let medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
+            html += `<div class="lb-item">
+                        <div class="lb-name">${medal} ${u.name || 'Игрок'}</div>
+                        <div class="lb-score">$${Number(u.money).toFixed(2)}</div>
+                     </div>`;
+        });
+        document.getElementById('lb-list').innerHTML =
