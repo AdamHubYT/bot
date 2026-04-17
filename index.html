@@ -566,4 +566,30 @@ async function openLeaderboard() {
                         <div class="lb-score">$${Number(u.money).toFixed(2)}</div>
                      </div>`;
         });
-        document.getElementById('lb-list').innerHTML =
+        document.getElementById('lb-list').innerHTML = html;
+    } catch(e) {
+        document.getElementById('lb-list').innerHTML = '<div style="text-align:center; color:#ff4444;">Error loading data</div>';
+    }
+}
+
+function copyRef(){
+    vibe('medium');
+    const link = `https://t.me/FuelTycoon_bot?start=${user_id}`;
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(link).then(() => tg.showAlert(t('sysCopied')));
+    } else {
+        let textArea = document.createElement("textarea");
+        textArea.value = link;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("Copy");
+        textArea.remove();
+        tg.showAlert(t('sysCopied'));
+    }
+}
+
+setInterval(sync, 3000);
+sync();
+</script>
+</body>
+</html>
